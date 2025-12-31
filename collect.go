@@ -18,6 +18,15 @@ func collect(inp any, prefix string, out *[]string, isArray bool, opt option) {
 		return
 	}
 
+	// Transformers
+	if res, ok := resolve(inp); ok {
+		for _, item := range res {
+			*out = append(*out, flat(prefix, item, isArray))
+		}
+
+		return
+	}
+
 	value := reflect.Indirect(reflect.ValueOf(inp))
 	switch value.Kind() {
 	case reflect.Array, reflect.Slice:

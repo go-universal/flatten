@@ -1,8 +1,44 @@
 package flatten
 
 import (
+	"fmt"
 	"testing"
 )
+
+func TestResolver(t *testing.T) {
+	type CustomType struct {
+		name string
+		Age  int
+	}
+
+	tests := []struct {
+		name     string
+		input    any
+		expected []string
+	}{
+		{
+			name:     "resolver",
+			input:    CustomType{name: "Alice", Age: 30},
+			expected: []string{"name:Alice"},
+		},
+	}
+
+	RegisterTransformer(func(v CustomType) []string {
+		return []string{
+			fmt.Sprintf("name:%s", v.name),
+		}
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := Flatten(tt.input)
+			if len(result) != len(tt.expected) {
+				t.Errorf("length mismatch:\n    got (%d): %+v \n    expected (%d) %+v", len(result), result, len(tt.expected), tt.expected)
+				return
+			}
+		})
+	}
+}
 
 func TestFlatten(t *testing.T) {
 	tests := []struct {
